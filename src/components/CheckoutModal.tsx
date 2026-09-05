@@ -38,7 +38,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     const generatedOrderId = `OG-${Math.floor(100000 + Math.random() * 900000)}`;
 
     try {
-      const { data, error } = await supabase
+      // Direct insert without .select() so public RLS restrictions don't block it
+      const { error } = await supabase
         .from('orders')
         .insert([
           {
@@ -55,8 +56,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               price: i.price,
             })),
           },
-        ])
-        .select();
+        ]);
 
       if (error) {
         console.error('DATABASE ERROR:', error);
@@ -65,7 +65,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         return;
       }
 
-      console.log('Order Successfully Created in DB:', data);
       setOrderId(generatedOrderId);
       clearCart();
     } catch (err: any) {
